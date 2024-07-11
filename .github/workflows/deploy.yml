@@ -1,0 +1,25 @@
+name: Deploy to MyDevil.net
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.MYDEVIL_SSH_KEY }}
+
+    - name: Copy files via SCP
+      run: scp -r * Hilver@s26.mydevil.net:/usr/home/Hilver/domains/peczkowski.eu/public_nodejs/public
+
+    - name: Restart server
+      run: ssh Hilver@s26.mydevil.net 'cd /usr/home/Hilver/domains/peczkowski.eu/public_nodejs/public && devil www restart peczkowski.eu'
